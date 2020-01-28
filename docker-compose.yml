@@ -1,0 +1,47 @@
+version: '3.4'
+
+services:
+  aplication:
+    build:
+      context: KelloWorld
+      dockerfile: Dockerfile
+    image: ${DockerRegistryURL}/api:${ImageTag}
+    deploy:
+      replicas: 1
+    ports:
+      - "8080:80"
+    networks:
+      - aplication
+    environment:
+      - MongoDbSettings__ConnectionString=mongodb://${MongoDB_User}:${MongoDB_Pass}@${MongoDB_Server}:27017
+      - MongoDbSettings__DatabaseName=${MongoDB_database}
+      - Logging__LogLevel__Default=Debug
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:4.2
+    command: mongod --auth
+    environment:
+      - MONGO_INITDB_DATABASE=${MongoDB_database}
+      - MONGO_INITDB_ROOT_USERNAME=${MongoDB_User}
+      - MONGO_INITDB_ROOT_PASSWORD=${MongoDB_Pass}
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - mongodbdata:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      application:
+        aliases:
+          - mongdb.local.com
+
+volumes:
+  mongodbdata:
+    driver: local
+
+networks:
+  application:
+    external:
+      name: backend
