@@ -1,19 +1,13 @@
-FROM microsoft/dotnet:3.0-aspnetcore-runtime AS base
-WORKDIR /app
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS base
 EXPOSE 80
 
-FROM microsoft/dotnet:3.0-sdk AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS build
 WORKDIR /src
-COPY ["KelloWorld/KelloWorld.csproj", "KelloWorld/"]
-RUN dotnet restore "KelloWorld/KelloWorld.csproj"
-COPY . .
-WORKDIR "/src/KelloWorld"
-RUN dotnet build "KelloWorld.csproj" -c Release -o /app
+ADD . .
 
-FROM build AS publish
-RUN dotnet publish "KelloWorld.csproj" -c Release -o /app
+RUN dotnet publish -c Release -o out
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app .
+COPY --from=build /src/out .
 ENTRYPOINT ["dotnet", "KelloWorld.dll"]
