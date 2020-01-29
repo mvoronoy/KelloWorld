@@ -5,7 +5,7 @@ services:
     build:
       context: KelloWorld
       dockerfile: Dockerfile
-    image: kelloworls
+    image: kelloworls:1.0.1
     container_name: kelloworls.container
     ports:
       - "8080:80"
@@ -13,7 +13,10 @@ services:
       - frontend
       - backend
     environment:
-      - MySQL__ConnectionString="server=mysql_db:3306;database=kelloworld;user=strong_user;password=strong_pass"
+      - MYSQL__SERVER=mysql_db
+      - MYSQL__DATABASE=kelloworld
+      - MYSQL__USER=strong_user
+      - MYSQL__PASSWORD=strong_pass
       - Logging__LogLevel__Default=Debug
     depends_on:
       - mysql_db

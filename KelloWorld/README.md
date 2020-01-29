@@ -21,3 +21,29 @@ Run application (with db) via docker-compose:
 ```
 $> docker-compose up --buid
 ```
+
+Deploy to minikube:
+Open PowerShell with Admin privelages
+Execute (should be executed in each PS window each time, otherwise minikube will not be able to find image)
+``` 
+$> minikube docker-env | Invoke-Expression
+```
+
+Build new app image:
+```
+$> docker-compose buid
+```
+Deploy mysql:
+```
+$> kubectl apply -f kubernetes\mysql.yml
+```
+
+Deploy app (should be deployed after db): 
+```
+$> kubectl apply -f .\kubernetes\application.yml
+```
+
+Access minikube dashboard to review results:
+```
+$> minikube dashboard
+```
