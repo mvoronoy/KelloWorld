@@ -19,7 +19,7 @@ $> docker-compose build
 
 Run application (with db) via docker-compose:
 ```
-$> docker-compose up --buid
+$> docker-compose up --build
 ```
 
 Deploy to minikube:
@@ -31,7 +31,7 @@ $> minikube docker-env | Invoke-Expression
 
 Build new app image:
 ```
-$> docker-compose buid
+$> docker-compose build
 ```
 Deploy mysql:
 ```
