@@ -13,32 +13,30 @@ services:
       - frontend
       - backend
     environment:
-      - MYSQL__SERVER=mysql_db
-      - MYSQL__DATABASE=kelloworld
-      - MYSQL__USER=strong_user
-      - MYSQL__PASSWORD=strong_pass
+      - PSQL__SERVER=psql_db
+      - PSQL__DATABASE=kelloworld
+      - PSQL__USER=strong_user
+      - PSQL__PASSWORD=strong_pass
       - Logging__LogLevel__Default=Debug
     depends_on:
-      - mysql_db
+      - psql_db
 
-  mysql_db:
-    image: mysql:8.0
-    command: --default-authentication-plugin=mysql_native_password
+  psql_db:
+    image: postgres:10.4
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=example
-      - MYSQL_DATABASE=kelloworld
-      - MYSQL_USER=strong_user
-      - MYSQL_PASSWORD=strong_pass
+      - POSTGRES_PASSWORD=strong_pass
+      - POSTGRES_USER=strong_user
+      - POSTGRES_DB=kelloworld
     volumes:
-      - mysqldata:/var/lib/mysql
+      - psqldata:/var/lib/mysql
     ports:
-      - 3306:3306
+      - 5432:5432
     networks:
       - backend
 
 volumes:
-  mysqldata:
+  psqldata:
     driver: local
 
 networks:

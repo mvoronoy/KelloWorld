@@ -23,16 +23,19 @@ spec:
             - containerPort: 80
               name: app-port
           env:
-            - name: MYSQL__SERVER
-              value: mysql
-            - name: MYSQL__DATABASE
+            - name: PSQL__SERVER
+              value: psql
+            - name: PSQL__DATABASE
               value: "kelloworld"
-            - name: MYSQL__USER
-              value: "strong_user"
-            - name: MYSQL__PASSWORD
+            - name: PSQL__USER
               valueFrom:
                 secretKeyRef:
-                  name: mysql
+                  name: psql
+                  key: user
+            - name: PSQL__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: psql
                   key: password
 ---
 apiVersion: v1

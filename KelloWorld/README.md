@@ -33,9 +33,9 @@ Build new app image:
 ```
 $> docker-compose buid
 ```
-Deploy mysql:
+Deploy psql:
 ```
-$> kubectl apply -f kubernetes\mysql.yml
+$> kubectl apply -f kubernetes\psql.yml
 ```
 
 Deploy app (should be deployed after db): 
