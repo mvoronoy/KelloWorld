@@ -1,22 +1,18 @@
 version: '3.4'
 
 services:
-  aplication:
+  kelloworld:
+    image: ${DOCKER_REGISTRY-}kelloworld
     build:
-      context: KelloWorld
+      context: ./KelloWorld
       dockerfile: Dockerfile
-    image: kelloworls:1.0.1
-    container_name: kelloworls.container
+    networks:
+      - backend
     ports:
       - "8080:80"
-    networks:
-      - frontend
-      - backend
     environment:
-      - PSQL__SERVER=psql_db
-      - PSQL__DATABASE=kelloworld
-      - PSQL__USER=strong_user
-      - PSQL__PASSWORD=strong_pass
+      - PostgreSQL__ConnectionString=server=psql_db;port=5432;userid=strong_user;database=kelloworld;
+      - PostgreSQL__DbPassword=strong_pass
       - Logging__LogLevel__Default=Debug
     depends_on:
       - psql_db
@@ -29,7 +25,7 @@ services:
       - POSTGRES_USER=strong_user
       - POSTGRES_DB=kelloworld
     volumes:
-      - psqldata:/var/lib/mysql
+      - psqldata:/var/lib/postgresql
     ports:
       - 5432:5432
     networks:
@@ -40,7 +36,5 @@ volumes:
     driver: local
 
 networks:
-  frontend:
-    driver: bridge
   backend:
     driver: bridge 
