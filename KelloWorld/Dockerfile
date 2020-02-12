@@ -8,7 +8,7 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
 COPY ["KelloWorld.csproj", "KelloWorld/"]
 RUN dotnet restore "KelloWorld/KelloWorld.csproj"
-COPY . .
+COPY . "KelloWorld/"
 WORKDIR "/src/KelloWorld"
 RUN dotnet build "KelloWorld.csproj" -c Release -o /app/build
 
