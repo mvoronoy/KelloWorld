@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using KelloWorld.Model;
+using KelloWorld.Model.CrossLayer;
 
 namespace KelloWorld.Controllers
 {
@@ -27,26 +28,13 @@ namespace KelloWorld.Controllers
         [HttpGet]
         public IEnumerable<Model.Blog> Get()
         {
-            //var rng = new Random();
-            //return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            //{
-            //    Date = DateTime.Now.AddDays(index),
-            //    TemperatureC = rng.Next(-20, 55),
-            //    Summary = Summaries[rng.Next(Summaries.Length)]
-            //})
-            //.ToArray();
-
             return _db.Blogs.ToArray();
         }
         [HttpGet("{id:int}", Name = "GetById")]
         public async Task<IActionResult> GetById(int id)
         {
             var b = await _db.Blogs.Where(b => b.BlogId == id)
-                .Select(dao => new BlogDto
-                {
-                    BlogId = dao.BlogId,
-                    Url = dao.Url
-                }).SingleOrDefaultAsync();
+                .Select(dao => dao.Cast<BlogDto>()).SingleOrDefaultAsync();
             if (b == null)
             {
                 return NotFound();
@@ -68,27 +56,41 @@ namespace KelloWorld.Controllers
             }
             try
             {
-                var newBlog = new Blog
-                {
-                    Url = blog.Url
-                };
+                var newBlog = blog.Cast<Blog>();
                 _db.Blogs.Add(newBlog);
                 await _db.SaveChangesAsync();
 
                 return CreatedAtRoute(
                     "GetById",
                     new { id = newBlog.BlogId },
-                    new BlogDto
-                    {
-                        BlogId = newBlog.BlogId,
-                        Url = newBlog.Url
-                    });
+                    newBlog.Cast< BlogDto>());
             }
             catch (DbUpdateException)
             {//Blog conflicts with existing records (duplicate) 
                 return Conflict();
             }
 
+        }
+        [HttpPost("{blogName}/post")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreatePost([FromRoute] string blogName, [FromBody] PostDto newPost)
+        {
+            var dbPost = newPost.Cast<Post>();
+            var dbBlog = await
+                _db.Blogs.Where(b => b.Url == blogName).SingleOrDefaultAsync();
+            if (dbBlog == null)
+            {
+                return BadRequest();
+            }
+            dbPost.BlogId = dbBlog.BlogId;
+            _db.Posts.Add(dbPost);
+            await _db.SaveChangesAsync();
+            return CreatedAtRoute(
+                    "api/Post",
+                    new { id = dbPost.PostId },
+                    dbPost.Cast<PostDto>()); 
         }
     }
 }
