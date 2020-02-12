@@ -6,7 +6,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["KelloWorld/KelloWorld.csproj", "KelloWorld/"]
+COPY ["KelloWorld.csproj", "KelloWorld/"]
 RUN dotnet restore "KelloWorld/KelloWorld.csproj"
 COPY . .
 WORKDIR "/src/KelloWorld"
