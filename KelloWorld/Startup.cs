@@ -51,7 +51,10 @@ namespace KelloWorld
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
+            //Add DAO services
             services.AddScoped<IPostService, PostService>();
+            // Register Hosted Services
+            services.AddHostedService<BackgroundService.ModeratePostsBackgroundService>();
         }
 
         private const string SwaggerTitle = "KelloWorld API";

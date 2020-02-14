@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace KelloWorld.Controllers
 {
@@ -58,23 +59,20 @@ namespace KelloWorld.Controllers
             return result;
         }
         [HttpGet("{postId}", Name = nameof(AssyncGetPostById))]
-        public async Task<IActionResult> AssyncGetPostById([FromRoute] int id)
+        public async Task<IActionResult> AssyncGetPostById([FromRoute] int postId)
         {
             try
             {
-                PostDto post = await _postService.GetModeratedPost(id);
+                PostDto post = await _postService.GetModeratedPost(postId);
+
                 return post == null
-                    ? (IActionResult)Accepted()/*not completed yet*/
+                    ? (IActionResult)Accepted(HttpContext.Request.GetDisplayUrl())/*not completed yet*/
                     : (IActionResult)Ok(post);
             }
-            catch (AggregateException ae) 
-            {
-                switch (ae.InnerException) {
-                    case EntityNotFound ef:
-                        return NotFound();
-                    default:
-                        throw ae.InnerException;
-                }
+            
+            catch (EntityNotFound e) {
+                _logger.LogWarning($"Queried unknown post {postId}");
+                return NotFound();
             }
         }
 
