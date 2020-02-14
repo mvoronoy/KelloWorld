@@ -9,6 +9,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using Npgsql.EntityFrameworkCore;
+using System.Reflection;
+using System.IO;
+using System;
+using KelloWorld.Service;
 
 namespace KelloWorld
 {
@@ -24,7 +28,6 @@ namespace KelloWorld
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-
             var connectionString = Configuration["PostgreSql:ConnectionString"];
             var dbPassword = Configuration["PostgreSql:DbPassword"];
 
@@ -42,7 +45,13 @@ namespace KelloWorld
             {
                 var ver = APIVersion;
                 c.SwaggerDoc(ver, new OpenApiInfo { Title = SwaggerTitle, Version = ver });
+
+                // Set the comments path for the Swagger JSON and UI.
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
+            services.AddScoped<IPostService, PostService>();
         }
 
         private const string SwaggerTitle = "KelloWorld API";

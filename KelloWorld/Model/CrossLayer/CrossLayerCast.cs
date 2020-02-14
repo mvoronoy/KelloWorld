@@ -11,7 +11,7 @@ namespace KelloWorld.Model.CrossLayer
         /// Convert one entity to another by copying from public getters properties to new target entity public setter properties
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <example> myBlog.Cast<BlogDto>() </example>
+        /// <example> myBlog.Cast &lt; BlogDto &gt;() </example>
         /// <param name="myobj"></param>
         /// <returns>new instance of type `T`</returns>
         public static T Cast<T>(this Object myobj)

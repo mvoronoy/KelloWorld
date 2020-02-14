@@ -24,12 +24,16 @@ namespace KelloWorld.Controllers
             _logger = logger;
             _db = db;
         }
-
+        /// <summary>
+        /// Get available Blogs, for security reason allows only top 100 items
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IEnumerable<Model.Blog> Get()
         {
-            return _db.Blogs.ToArray();
+            return _db.Blogs.Take(100).ToArray();
         }
+        
         [HttpGet("{id:int}", Name = "GetById")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -42,6 +46,13 @@ namespace KelloWorld.Controllers
             return Ok(b);
         }
 
+        /// <summary>
+        /// Create new Blog.
+        /// </summary>
+        /// Pre-request blog.Url must be unique blog alpha-numeric name
+        /// <response code="201">Returns the newly created item</response>
+        /// <response code="400">If validation of input JSON failed</response> 
+        /// <response code="409">Specified blog name is not unique</response> 
         [HttpPost]
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -63,34 +74,12 @@ namespace KelloWorld.Controllers
                 return CreatedAtRoute(
                     "GetById",
                     new { id = newBlog.BlogId },
-                    newBlog.Cast< BlogDto>());
+                    newBlog.Cast<BlogDto>());
             }
             catch (DbUpdateException)
             {//Blog conflicts with existing records (duplicate) 
                 return Conflict();
             }
-
-        }
-        [HttpPost("{blogName}/post")]
-        [Consumes(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreatePost([FromRoute] string blogName, [FromBody] PostDto newPost)
-        {
-            var dbPost = newPost.Cast<Post>();
-            var dbBlog = await
-                _db.Blogs.Where(b => b.Url == blogName).SingleOrDefaultAsync();
-            if (dbBlog == null)
-            {
-                return BadRequest();
-            }
-            dbPost.BlogId = dbBlog.BlogId;
-            _db.Posts.Add(dbPost);
-            await _db.SaveChangesAsync();
-            return CreatedAtRoute(
-                    "api/Post",
-                    new { id = dbPost.PostId },
-                    dbPost.Cast<PostDto>()); 
         }
     }
 }
