@@ -17,22 +17,15 @@ spec:
     spec:
       containers:
         - name: application
-          image: 'kelloworls:1.0.1'
-          imagePullPolicy: Never
+          image: mvoronoy/kelloworld:1.0.1
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
               name: app-port
           env:
-            - name: PSQL__SERVER
-              value: psql
-            - name: PSQL__DATABASE
-              value: "kelloworld"
-            - name: PSQL__USER
-              valueFrom:
-                secretKeyRef:
-                  name: psql
-                  key: user
-            - name: PSQL__PASSWORD
+            - name: PostgreSQL__ConnectionString
+              value: "server=postgres;port=5432;userid=postgres;database=kelloworld;"
+            - name: PostgreSql__DbPassword
               valueFrom:
                 secretKeyRef:
                   name: psql
